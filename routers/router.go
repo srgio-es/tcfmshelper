@@ -1,8 +1,11 @@
 package routers
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/srgio-es/tcfmshelper/fscadmin"
+	"github.com/srgio-es/tcfmshelper/fscadmin/model"
 	"github.com/srgio-es/tcfmshelper/settings"
 )
 
@@ -18,17 +21,24 @@ func InitRouter() *gin.Engine {
 		})
 	})
 
-	r.GET("/fscstatus", func(c *gin.Context) {
+	r.GET("/fscstatus/:host", func(c *gin.Context) {
+
+		host := c.Param("host")
+
+		log.Printf("host: %s", host)
 
 		fscCommand := fscadmin.FscCommand{
-			JavaHome:   settings.AppSettings.JavaHome,
-			FmsHome:    settings.FscSettings.FscLocation,
-			FscFromUrl: settings.FscSettings.FscFromUrl,
+			JavaHome: settings.AppSettings.JavaHome,
+			FmsHome:  settings.FscSettings.FscLocation,
 		}
 
-		status := fscCommand.FSCStatus()
+		status, err := fscCommand.FSCStatus(host)
 
-		c.JSON(200, status)
+		if err != nil {
+			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
+		} else {
+			c.JSON(200, status)
+		}
 	})
 
 	return r

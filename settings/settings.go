@@ -21,7 +21,6 @@ type Server struct {
 
 type FSC struct {
 	FscLocation string
-	FscFromUrl  string
 }
 
 var AppSettings = &Application{}
@@ -62,5 +61,5 @@ func Setup() {
 //PrintDebugConfig prints the configuration if debug is enabled
 func PrintDebugConfig() {
 	log.Printf("Server config loaded: \n  -- RunMode: %s\n  -- Port: %d\n  -- ReadTimeout: %v\n  -- WriteTimeout: %v\n", ServerSettings.RunMode, ServerSettings.Port, ServerSettings.ReadTimeout, ServerSettings.WriteTimeout)
-	log.Printf("FSC config loaded: \n  -- FscLocation: %s\n  -- FscFromUrl: %s\n", FscSettings.FscLocation, FscSettings.FscFromUrl)
+	log.Printf("FSC config loaded: \n  -- FscLocation: %s\n", FscSettings.FscLocation)
 }

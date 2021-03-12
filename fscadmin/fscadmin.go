@@ -12,9 +12,8 @@ import (
 )
 
 type FscCommand struct {
-	JavaHome   string
-	FmsHome    string
-	FscFromUrl string
+	JavaHome string
+	FmsHome  string
 }
 
 func (fsc *FscCommand) fscAdminExec(args ...string) (string, error) {
@@ -33,21 +32,18 @@ func (fsc *FscCommand) fscAdminExec(args ...string) (string, error) {
 
 	output, err := cmd.CombinedOutput()
 
-	if err != nil {
-		log.Printf("Error executing fscadmin: %v", err)
-		return "", err
-	}
-
 	return fmt.Sprintf("%s", output), err
 }
 
-func (fsc *FscCommand) FSCStatus() model.FscStatus {
-	result, err := fsc.fscAdminExec("-s", fsc.FscFromUrl, "./status")
+func (fsc *FscCommand) FSCStatus(host string) (model.FscStatus, error) {
+	url := "http://" + host
+	output, err := fsc.fscAdminExec("-s", url, "./status")
 	if err != nil {
-		log.Printf("Error executing fscadmin: %v", err)
+		log.Printf("Error executing FSCStatus error: %v\nresult:%v", err, output)
+		return model.FscStatus{}, parseError(output)
 	}
 
-	return parseStatus(result)
+	return parseStatus(output), nil
 
 }
 
@@ -74,7 +70,25 @@ func parseStatus(status string) model.FscStatus {
 
 	//TODO: Parse duration
 
+	fscStatus.Status = model.STATUS_OK
+
 	log.Printf("%#v", fscStatus)
 
 	return fscStatus
+}
+
+func parseError(output string) error {
+	var err error
+
+	lines := strings.ReplaceAll(output, "\n", "")
+	linesSplited := strings.Split(lines, "\r")
+
+	nativeError := linesSplited[3]
+
+	if strings.Contains(nativeError, "java.net.UnknownHostException") {
+		unkownHost := nativeError[strings.Index(nativeError, ":")+1:]
+		err = fmt.Errorf("Unknown Host: %s", unkownHost)
+	}
+
+	return err
 }
