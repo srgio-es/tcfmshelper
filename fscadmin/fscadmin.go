@@ -85,9 +85,13 @@ func parseError(output string) error {
 
 	nativeError := linesSplited[3]
 
-	if strings.Contains(nativeError, "java.net.UnknownHostException") {
-		unkownHost := nativeError[strings.Index(nativeError, ":")+1:]
+	switch {
+	case strings.Contains(nativeError, "java.net.UnknownHostException"):
+		unkownHost := nativeError[strings.Index(nativeError, ":")+2:]
 		err = fmt.Errorf("Unknown Host: %s", unkownHost)
+	case strings.Contains(nativeError, "java.net.ConnectException"):
+		unkownHost := nativeError[strings.Index(nativeError, ":")+2:]
+		err = fmt.Errorf("%s", unkownHost)
 	}
 
 	return err
