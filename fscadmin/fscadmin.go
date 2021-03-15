@@ -64,8 +64,6 @@ func parseStatus(status string) model.FscStatus {
 	lines := strings.ReplaceAll(status, "\n", "")
 	linesSplited := strings.Split(lines, "\r")
 
-	log.Printf("%#v", linesSplited)
-
 	switch {
 	case linesSplited[3] == "true":
 		fscStatus.Status = model.STATUS_OK

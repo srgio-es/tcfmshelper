@@ -48,6 +48,15 @@ func Setup() {
 		log.Fatalf("Failed to map fsc settings from ini file: %v", err)
 	}
 
+	if FscSettings.FscLocation == "" {
+		fmsHome := os.Getenv("FMS_HOME")
+		if fmsHome == "" {
+			log.Fatalln("FMS tools location is not specified. It must be specified by the FMS_HOME environment variable or in the conf/settings.ini FscLocation parameter")
+		} else {
+			FscSettings.FscLocation = fmsHome
+		}
+	}
+
 	AppSettings.JavaHome = os.Getenv("JAVA_HOME")
 	if AppSettings.JavaHome == "" {
 		log.Println("JAVA_HOME is not defined")
