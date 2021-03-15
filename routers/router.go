@@ -29,8 +29,9 @@ func InitRouter() *gin.Engine {
 	r.GET("/fscstatus/:host", func(c *gin.Context) {
 
 		host := c.Param("host")
+		port := c.DefaultQuery("port", "4544")
 
-		status, err := fscCommand.FSCStatus(host)
+		status, err := fscCommand.FSCStatus(host, port)
 
 		if err != nil {
 			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
@@ -41,8 +42,9 @@ func InitRouter() *gin.Engine {
 
 	r.GET("/fscalive/:host", func(c *gin.Context) {
 		host := c.Param("host")
+		port := c.DefaultQuery("port", "4544")
 
-		status, err := fscCommand.FCSAlive(host)
+		status, err := fscCommand.FCSAlive(host, port)
 
 		if err != nil {
 			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})

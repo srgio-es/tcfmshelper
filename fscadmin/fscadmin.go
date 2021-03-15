@@ -35,8 +35,8 @@ func (fsc *FscCommand) fscAdminExec(args ...string) (string, error) {
 	return fmt.Sprintf("%s", output), err
 }
 
-func (fsc *FscCommand) FSCStatus(host string) (model.FscStatus, error) {
-	url := "http://" + host
+func (fsc *FscCommand) FSCStatus(host string, port string) (model.FscStatus, error) {
+	url := "http://" + host + ":" + port
 	output, err := fsc.fscAdminExec("-s", url, "./status")
 	if err != nil {
 		log.Printf("Error executing FSCStatus error: %v\nresult: %v", err, output)
@@ -47,8 +47,8 @@ func (fsc *FscCommand) FSCStatus(host string) (model.FscStatus, error) {
 
 }
 
-func (fsc *FscCommand) FCSAlive(host string) (model.FscStatus, error) {
-	url := "http://" + host
+func (fsc *FscCommand) FCSAlive(host string, port string) (model.FscStatus, error) {
+	url := "http://" + host + ":" + port
 	output, err := fsc.fscAdminExec("-s", url, "./alive")
 	if err != nil {
 		log.Printf("Error executing FSCAlive error: %s\nresult: %v", err, output)
