@@ -39,12 +39,23 @@ func (fsc *FscCommand) FSCStatus(host string) (model.FscStatus, error) {
 	url := "http://" + host
 	output, err := fsc.fscAdminExec("-s", url, "./status")
 	if err != nil {
-		log.Printf("Error executing FSCStatus error: %v\nresult:%v", err, output)
+		log.Printf("Error executing FSCStatus error: %v\nresult: %v", err, output)
 		return model.FscStatus{}, parseError(output)
 	}
 
 	return parseStatus(output), nil
 
+}
+
+func (fsc *FscCommand) FCSAlive(host string) (model.FscStatus, error) {
+	url := "http://" + host
+	output, err := fsc.fscAdminExec("-s", url, "./alive")
+	if err != nil {
+		log.Printf("Error executing FSCAlive error: %s\nresult: %v", err, output)
+		return model.FscStatus{}, parseError(output)
+	}
+
+	return parseStatus(output), nil
 }
 
 func parseStatus(status string) model.FscStatus {
@@ -55,26 +66,35 @@ func parseStatus(status string) model.FscStatus {
 
 	log.Printf("%#v", linesSplited)
 
-	fscStatus.FSCId = linesSplited[3][8:strings.Index(linesSplited[3], ",")]
-	fscStatus.Site = linesSplited[3][strings.Index(linesSplited[3], ",")+7:]
+	switch {
+	case linesSplited[3] == "true":
+		fscStatus.Status = model.STATUS_OK
+		return fscStatus
 
-	var err error
-	fscStatus.CurrentFileConnections, err = strconv.ParseInt(linesSplited[5][strings.Index(linesSplited[5], ":")+2:], 10, 64)
-	if err != nil {
-		log.Printf("Failed while parsing FSC Status result: %v", err)
+	default:
+		fscStatus.FSCId = linesSplited[3][8:strings.Index(linesSplited[3], ",")]
+		fscStatus.Site = linesSplited[3][strings.Index(linesSplited[3], ",")+7:]
+
+		var err error
+		fscStatus.CurrentFileConnections, err = strconv.ParseInt(linesSplited[5][strings.Index(linesSplited[5], ":")+2:], 10, 64)
+		if err != nil {
+			log.Printf("Failed while parsing FSC Status result: %v", err)
+		}
+		fscStatus.CurrentAdminConnections, err = strconv.ParseInt(linesSplited[6][strings.Index(linesSplited[6], ":")+2:], 10, 64)
+		if err != nil {
+			log.Printf("Failed while parsing FSC Status result: %v", err)
+		}
+
+		//TODO: Parse duration
+
+		fscStatus.Status = model.STATUS_OK
+
+		log.Printf("%#v", fscStatus)
+
+		return fscStatus
+
 	}
-	fscStatus.CurrentAdminConnections, err = strconv.ParseInt(linesSplited[6][strings.Index(linesSplited[6], ":")+2:], 10, 64)
-	if err != nil {
-		log.Printf("Failed while parsing FSC Status result: %v", err)
-	}
 
-	//TODO: Parse duration
-
-	fscStatus.Status = model.STATUS_OK
-
-	log.Printf("%#v", fscStatus)
-
-	return fscStatus
 }
 
 func parseError(output string) error {
