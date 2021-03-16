@@ -72,13 +72,15 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:
-    ```
-    500 SERVER ERROR
-    {
-        "status":"KO",
-        "message":"Error message: reason"
-    }
-    ```
+
+```
+500 SERVER ERROR
+{
+    "status":"KO",
+    "message":"Error message: reason"
+}
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
