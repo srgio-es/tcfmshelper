@@ -14,10 +14,9 @@ All the configuration is done through the conf/settings.ini file and standard TC
 
 ### Environment Variables:
 
-- ```FMS_HOME``` should point to a valid folder containing fscadmin.bat/sh script and ```jar``` folder with the Teamcenter FSC jars  
-    ```FMS_HOME=C:\Siemens\TC116\fsc```
+- ```JAVA_HOME``` should point to a valid Java JRE folder. The proccess will look for ```bin/java``` inside this folder. This is **mandatory**.
 
-- ```JAVA_HOME``` should point to a valid Java JRE folder. The proccess will look for ```bin/java``` inside this folder
+- ```FMS_HOME``` should point to a valid folder containing fscadmin.bat/sh script and **jar** folder with the Teamcenter FSC jars, for example: ```FMS_HOME=C:\Siemens\TC116\fsc```. This is **optional** as it could be defined in ```settings.ini``` also.
 
 ### settings.ini
 
