@@ -37,11 +37,15 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
 
 ### serverhealth
     200 OK
-    http(s)://servername:port/serverhealt - Shows if this server is running
+    http(s)://servername:port/serverhealt
+    
+    Shows if this server is running
 
 ### fscstatus
-
-    http(s)://servername:port/fscstatus/$fschostname - Returns a JSON with the status of the passed FSC, for example: http://fmshelper.yolo.com:8080/fscstatus/foo-bar-fsc1 (optional query parameter port: ?port=1234)
+    200 OK
+    http(s)://servername:port/fscstatus/$fschostname
+    
+    Returns a JSON with the status of the passed FSC, for example: http://fmshelper.yolo.com:8080/fscstatus/foo-bar-fsc1 (optional query parameter port: ?port=1234)
 
 ```
 200 OK
@@ -55,8 +59,10 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
 ```
 
 ### fscalive
-
-    http(s)://servername:port/fscalive/$fschostname - Returns a JSON if the fsc server is alive, for example: http://fmshelper.yolo.com:8080/fscalive/foo-bar-fsc1 (optional query parameter port: ?port=1234)
+    200 OK
+    http(s)://servername:port/fscalive/$fschostname
+    
+    Returns a JSON if the fsc server is alive, for example: http://fmshelper.yolo.com:8080/fscalive/foo-bar-fsc1 (optional query parameter port: ?port=1234)
 
 ```
 200 OK
@@ -66,11 +72,13 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:
-
+    ```
+    500 SERVER ERROR
     {
         "status":"KO",
         "message":"Error message: reason"
     }
+    ```
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
