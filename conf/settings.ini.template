@@ -6,4 +6,4 @@ WriteTimeout = 60s
 
 [fsc]
 FscLocation=C:\Siemens\TC116\fsc
-FmsMasterURL=fmshost1:4544,fmshost2:4544 #comma separated list
+FmsMasterURL=fms1:4544,fms2:4544 #comma separated list
