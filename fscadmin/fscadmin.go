@@ -47,6 +47,17 @@ func (fsc *FscCommand) FSCStatus(host string, port string) (model.FscStatus, err
 
 }
 
+func (fsc *FscCommand) FSCConfig(host string, port string) (string, error) {
+	url := "http://" + host + ":" + port
+	output, err := fsc.fscAdminExec("-s", url, "./config")
+	if err != nil {
+		log.Printf("Error executing FSCConfig error: %v\nresult: %v", err, output)
+		return "", parseError(output)
+	}
+
+	return output[strings.Index(output, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>") : strings.LastIndex(output, "</fmsworld>")+len("</fmsworld>")], nil
+}
+
 func (fsc *FscCommand) FCSAlive(host string, port string) (model.FscStatus, error) {
 	url := "http://" + host + ":" + port
 	output, err := fsc.fscAdminExec("-s", url, "./alive")
@@ -130,7 +141,7 @@ func parseError(output string) error {
 	// lines := strings.ReplaceAll(output, "\n", "")
 	linesSplited := strings.Split(output, "\n")
 
-	nativeError := linesSplited[3]
+	nativeError := strings.ReplaceAll(linesSplited[3], "\r", "")
 
 	switch {
 	case strings.Contains(nativeError, "java.net.UnknownHostException"):
@@ -139,6 +150,9 @@ func parseError(output string) error {
 	case strings.Contains(nativeError, "java.net.ConnectException"):
 		unkownHost := nativeError[strings.Index(nativeError, ":")+2:]
 		err = fmt.Errorf("%s", unkownHost)
+	case strings.Contains(nativeError, "java.net.MalformedURLException"):
+		malformedUri := nativeError[strings.Index(nativeError, ":")+2:]
+		err = fmt.Errorf("Malformed URI: %s", malformedUri)
 	}
 
 	return err

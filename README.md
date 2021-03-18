@@ -29,6 +29,8 @@ ReadTimeout|60s|With unit (s for seconds, m for minutes)
 WriteTimeout|60s|With unit (s for seconds, m for minutes)
 **[fsc]**| | 
 FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Environment Variable FMS\_HOME. Overrides the variable if specified.
+FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FMSs where the app will look.
+
 ## Usage
 
 - TODO
@@ -92,6 +94,17 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
    }
 }
 ```
+### fscconfig
+    200 OK
+    http(s)://servername:port/fscconfig/
+
+    Returns the native TC XML document with the FMS configuration from the declared FMS master servers in settings.ini. 
+    It will look for the configuration in order and returns the first server that responds to the command without errors.
+### fscconfig/$host
+    200 OK
+    http(s)://servername:port/fscconfig/$host
+
+    Returns the native TC XML document with the FMS configuration from the passed FMS/FSC server, for example: http://fmshelper.yolo.com:8080/fscconfig/foo-bar-fsc1 (optional query parameter port: ?port=1234)
 
 ### Error handling 
 
