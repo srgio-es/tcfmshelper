@@ -106,6 +106,12 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 
     Returns the native TC XML document with the FMS configuration from the passed FMS/FSC server, for example: http://fmshelper.yolo.com:8080/fscconfig/foo-bar-fsc1 (optional query parameter port: ?port=1234)
 
+### fscconfig/$host/hash/
+    200 OK
+    http(s)://servername:port/fscconfig/$host/hash
+
+    Returns a string with the FMS configuration hash from the passed FMS/FSC server, for example: http://fmshelper.yolo.com:8080/fscconfig/foo-bar-fsc1/hash/ (optional query parameter port: ?port=1234)
+
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:

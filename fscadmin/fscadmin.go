@@ -80,6 +80,16 @@ func (fsc *FscCommand) FSCVersion(host string, port string) (model.FSCVersion, e
 	return parseVersion(output), nil
 }
 
+func (fsc *FscCommand) FSCConfigHash(host string, port string) (string, error) {
+	url := "http://" + host + ":" + port
+	output, err := fsc.fscAdminExec("-s", url, "./config/hash")
+	if err != nil {
+		log.Printf("Error executing FscVersion error: %s\nresult: %v", err, output)
+		return "", parseError(output)
+	}
+	return parseHash(output), nil
+}
+
 func parseStatus(status string) model.FscStatus {
 	var fscStatus model.FscStatus
 
@@ -133,6 +143,17 @@ func parseVersion(output string) model.FSCVersion {
 	fscVersion.FscJavaClientProxy.BuildDate = linesSplited[5][strings.LastIndex(linesSplited[5], ":")+2:]
 
 	return fscVersion
+}
+
+func parseHash(output string) string {
+	var result string
+
+	lines := strings.ReplaceAll(output, "\n", "")
+	linesSplited := strings.Split(lines, "\r")
+
+	result = linesSplited[3]
+
+	return result
 }
 
 func parseError(output string) error {

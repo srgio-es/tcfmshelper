@@ -84,6 +84,19 @@ func InitRouter() *gin.Engine {
 		}
 	})
 
+	r.GET("/fscconfig/:host/hash/", func(c *gin.Context) {
+		host := c.Param("host")
+		port := c.DefaultQuery("port", "4544")
+
+		output, err := fscCommand.FSCConfigHash(host, port)
+
+		if err != nil {
+			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
+		} else {
+			c.String(200, output)
+		}
+	})
+
 	r.GET("/fscconfig/", func(c *gin.Context) {
 		for i, fsc := range settings.FscSettings.FmsMasterURL {
 			host := fsc[:strings.Index(fsc, ":")]
