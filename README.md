@@ -69,6 +69,30 @@ FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Env
 {"status":"OK"}
 ```
 
+### fscversion
+    200 OK
+    http(s)://servername:port/fscversion/$fschostname
+    
+    Returns a JSON with the components version of the passed FSC, for example: http://fmshelper.yolo.com:8080/fscversion/foo-bar-fsc1 (optional query parameter port: ?port=1234)
+
+```
+200 OK
+{
+   "fms_server_cache":{
+      "version":"11.6.0",
+      "build_date":"20190930"
+   },
+   "fms_util":{
+      "version":"11.6.0",
+      "build_date":"20190930"
+   },
+   "fsc_java_client_proxy":{
+      "version":"11.6.0",
+      "build_date":"20190930"
+   }
+}
+```
+
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:

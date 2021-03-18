@@ -14,6 +14,17 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+type version struct {
+	Version   string `json:"version"`
+	BuildDate string `json:"build_date,omitempty"`
+}
+
+type FSCVersion struct {
+	FmsServerCache     version `json:"fms_server_cache,omitempty"`
+	FmsUtil            version `json:"fms_util,omitempty"`
+	FscJavaClientProxy version `json:"fsc_java_client_proxy,omitempty"`
+}
+
 type FscStatus struct {
 	Status                  Status        `json:"status"`
 	FSCId                   string        `json:"fsc_id,omitempty"`

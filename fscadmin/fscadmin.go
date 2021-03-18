@@ -58,6 +58,17 @@ func (fsc *FscCommand) FCSAlive(host string, port string) (model.FscStatus, erro
 	return parseStatus(output), nil
 }
 
+func (fsc *FscCommand) FSCVersion(host string, port string) (model.FSCVersion, error) {
+	url := "http://" + host + ":" + port
+	output, err := fsc.fscAdminExec("-s", url, "./version")
+	if err != nil {
+		log.Printf("Error executing FscVersion error: %s\nresult: %v", err, output)
+		return model.FSCVersion{}, parseError(output)
+	}
+
+	return parseVersion(output), nil
+}
+
 func parseStatus(status string) model.FscStatus {
 	var fscStatus model.FscStatus
 
@@ -95,11 +106,29 @@ func parseStatus(status string) model.FscStatus {
 
 }
 
-func parseError(output string) error {
-	var err error
+func parseVersion(output string) model.FSCVersion {
+	var fscVersion model.FSCVersion
 
 	lines := strings.ReplaceAll(output, "\n", "")
 	linesSplited := strings.Split(lines, "\r")
+
+	fscVersion.FmsServerCache.Version = linesSplited[3][strings.Index(linesSplited[3], ":")+2 : strings.Index(linesSplited[3], ",")]
+	fscVersion.FmsServerCache.BuildDate = linesSplited[3][strings.LastIndex(linesSplited[3], ":")+2:]
+
+	fscVersion.FmsUtil.Version = linesSplited[4][strings.Index(linesSplited[4], ":")+2 : strings.Index(linesSplited[4], ",")]
+	fscVersion.FmsUtil.BuildDate = linesSplited[4][strings.LastIndex(linesSplited[4], ":")+2:]
+
+	fscVersion.FscJavaClientProxy.Version = linesSplited[5][strings.Index(linesSplited[5], ":")+2 : strings.Index(linesSplited[5], ",")]
+	fscVersion.FscJavaClientProxy.BuildDate = linesSplited[5][strings.LastIndex(linesSplited[5], ":")+2:]
+
+	return fscVersion
+}
+
+func parseError(output string) error {
+	var err error
+
+	// lines := strings.ReplaceAll(output, "\n", "")
+	linesSplited := strings.Split(output, "\n")
 
 	nativeError := linesSplited[3]
 

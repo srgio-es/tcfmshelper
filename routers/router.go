@@ -53,5 +53,18 @@ func InitRouter() *gin.Engine {
 		}
 	})
 
+	r.GET("/fscversion/:host", func(c *gin.Context) {
+		host := c.Param("host")
+		port := c.DefaultQuery("port", "4544")
+
+		status, err := fscCommand.FSCVersion(host, port)
+
+		if err != nil {
+			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
+		} else {
+			c.JSON(200, status)
+		}
+	})
+
 	return r
 }
