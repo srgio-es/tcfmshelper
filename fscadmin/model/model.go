@@ -33,3 +33,11 @@ type FscStatus struct {
 	CurrentFileConnections  int64         `json:"current_file_connections,omitempty"`
 	CurrentAdminConnections int64         `json:"current_admin_connections,omitempty"`
 }
+
+type FscConfig struct {
+	Status     Status `json:"status"`
+	FSCId      string `json:"fsc_id,omitempty"`
+	IsMaster   bool   `json:"is_master"`
+	ConfigHash string `json:"config_hash,omitempty"`
+	Error      string `json:"error,omitempty"`
+}

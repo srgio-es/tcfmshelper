@@ -112,6 +112,35 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 
     Returns a string with the FMS configuration hash from the passed FMS/FSC server, for example: http://fmshelper.yolo.com:8080/fscconfig/foo-bar-fsc1/hash/ (optional query parameter port: ?port=1234)
 
+### fmsconfigreport/
+    200 OK
+    http(s)://servername:port/fscconfigreport/
+
+    Returns a JSON with an array of objects with the result of the FSCAdmin ./config/report command for the first available configured FMSMaster in settings.ini
+
+```json
+[
+    {
+      "status":"OK",
+      "fsc_id":"FMS01",
+      "is_master":true, //True for FMS master servers, false for slaves
+      "config_hash":"558c95a37eaee435e45a0e4e1400f097"
+   },
+   {
+      "status":"OK",
+      "fsc_id":"FSC01",
+      "is_master":false,
+      "config_hash":"558c95a37eaee435e45a0e4e1400f097" //Only shown if not error is thrown
+   },
+   {
+      "status":"KO",
+      "fsc_id":"FSC02",
+      "is_master":false,
+      "error":"ERROR_ALL_LINKS_DOWN_1{[[-1946043301^FMS01 -1945380301^AGROUP -194653401^FSC02]]}" //The error is only shown when exists
+   }
+]
+```
+
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:

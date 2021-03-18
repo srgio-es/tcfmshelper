@@ -90,11 +90,20 @@ func (fsc *FscCommand) FSCConfigHash(host string, port string) (string, error) {
 	return parseHash(output), nil
 }
 
+func (fsc *FscCommand) FSCConfigReport(host string, port string) ([]model.FscConfig, error) {
+	url := "http://" + host + ":" + port
+	output, err := fsc.fscAdminExec("-s", url, "./config/report")
+	if err != nil {
+		log.Printf("Error executing FscVersion error: %s\nresult: %v", err, output)
+		return nil, parseError(output)
+	}
+	return parseConfigReport(output), nil
+}
+
 func parseStatus(status string) model.FscStatus {
 	var fscStatus model.FscStatus
 
-	lines := strings.ReplaceAll(status, "\n", "")
-	linesSplited := strings.Split(lines, "\r")
+	linesSplited := cleanAndSplitOutput(status)
 
 	switch {
 	case linesSplited[3] == "true":
@@ -130,8 +139,7 @@ func parseStatus(status string) model.FscStatus {
 func parseVersion(output string) model.FSCVersion {
 	var fscVersion model.FSCVersion
 
-	lines := strings.ReplaceAll(output, "\n", "")
-	linesSplited := strings.Split(lines, "\r")
+	linesSplited := cleanAndSplitOutput(output)
 
 	fscVersion.FmsServerCache.Version = linesSplited[3][strings.Index(linesSplited[3], ":")+2 : strings.Index(linesSplited[3], ",")]
 	fscVersion.FmsServerCache.BuildDate = linesSplited[3][strings.LastIndex(linesSplited[3], ":")+2:]
@@ -146,14 +154,57 @@ func parseVersion(output string) model.FSCVersion {
 }
 
 func parseHash(output string) string {
-	var result string
+	return cleanAndSplitOutput(output)[3]
+}
 
-	lines := strings.ReplaceAll(output, "\n", "")
-	linesSplited := strings.Split(lines, "\r")
+func parseConfigReport(output string) []model.FscConfig {
+	var result []model.FscConfig
 
-	result = linesSplited[3]
+	linesSplited := cleanAndSplitOutput(output)
+
+	mastersIndex := indexOf("# masters", linesSplited)
+	slavesindex := indexOf("# slaves", linesSplited)
+
+	masters := linesSplited[mastersIndex+1 : slavesindex]
+	slaves := linesSplited[slavesindex+1:]
+
+	for _, item := range masters {
+		result = append(result, convertToConfigItem(item))
+	}
+
+	for _, item := range slaves {
+		result = append(result, convertToConfigItem(item))
+	}
 
 	return result
+}
+
+func convertToConfigItem(configline string) model.FscConfig {
+	var item model.FscConfig
+	var err error
+
+	splitted := strings.Split(configline, ",")
+
+	item.FSCId = splitted[0]
+	item.ConfigHash = splitted[1]
+
+	item.IsMaster, err = strconv.ParseBool(splitted[2])
+	if err != nil {
+		log.Printf("Failed while parsing FSC config item: %v", err)
+	}
+
+	if splitted[3] == "ok" {
+		item.Status = model.STATUS_OK
+	} else {
+		item.Status = model.STATUS_KO
+		//The following is not the prettiest but is done to keep output split straightforward.
+		errors := splitted[3:]
+		for _, e := range errors {
+			item.Error += "," + e
+		}
+	}
+
+	return item
 }
 
 func parseError(output string) error {
@@ -177,4 +228,24 @@ func parseError(output string) error {
 	}
 
 	return err
+}
+
+func cleanAndSplitOutput(output string) []string {
+	lines := strings.ReplaceAll(output, "\n", "")
+	linesSplited := strings.Split(lines, "\r")
+
+	if len(linesSplited) > 0 {
+		linesSplited = linesSplited[:len(linesSplited)-1]
+	}
+
+	return linesSplited
+}
+
+func indexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
 }
