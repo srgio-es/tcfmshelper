@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antchfx/xmlquery"
 	"github.com/srgio-es/tcfmshelper/fscadmin/model"
 )
 
@@ -41,11 +42,44 @@ func (fsc *FscCommand) FSCStatus(host string, port string) (model.FscStatus, err
 	output, err := fsc.fscAdminExec("-s", url, "./status")
 	if err != nil {
 		log.Printf("Error executing FSCStatus error: %v\nresult: %v", err, output)
-		return model.FscStatus{}, parseError(output)
+		return model.FscStatus{Host: host}, parseError(output)
 	}
 
-	return parseStatus(output), nil
+	return parseStatus(output, host), nil
 
+}
+
+func (fsc *FscCommand) FSCStatusAll(host string, port string) ([]model.FscStatus, error) {
+
+	var result []model.FscStatus
+
+	configXml, err := fsc.FSCConfig(host, port)
+	if err != nil {
+		return nil, err
+	}
+
+	doc, err := xmlquery.Parse(strings.NewReader(configXml))
+	if err != nil {
+		log.Printf("Error while parsing FSC Config XML error: %v\n", err)
+		return nil, err
+	}
+
+	for i, n := range xmlquery.Find(doc, "//fsc") {
+		fmt.Printf("#%d %v\n", i, n.SelectAttr("address"))
+		addr := n.SelectAttr("address")
+		h := addr[strings.Index(addr, "//")+2 : strings.LastIndex(addr, ":")]
+		p := addr[strings.LastIndex(addr, ":")+1:]
+		log.Printf("host: %s -- port: %s", h, p)
+
+		status, err := fsc.FSCStatus(h, p)
+		if err != nil {
+			status = model.FscStatus{Host: h, Status: model.STATUS_KO, Error: err.Error()}
+		}
+
+		result = append(result, status)
+	}
+
+	return result, nil
 }
 
 func (fsc *FscCommand) FSCConfig(host string, port string) (string, error) {
@@ -88,7 +122,7 @@ func (fsc *FscCommand) FCSAlive(host string, port string) (model.FscStatus, erro
 		return model.FscStatus{}, parseError(output)
 	}
 
-	return parseStatus(output), nil
+	return parseStatus(output, host), nil
 }
 
 func (fsc *FscCommand) FSCVersion(host string, port string) (model.FSCVersion, error) {

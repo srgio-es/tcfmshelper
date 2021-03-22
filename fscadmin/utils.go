@@ -9,10 +9,12 @@ import (
 	"github.com/srgio-es/tcfmshelper/fscadmin/model"
 )
 
-func parseStatus(status string) model.FscStatus {
+func parseStatus(status string, host string) model.FscStatus {
 	var fscStatus model.FscStatus
 
 	linesSplited := cleanAndSplitOutput(status)
+
+	fscStatus.Host = host
 
 	switch {
 	case linesSplited[3] == "true":

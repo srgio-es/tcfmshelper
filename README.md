@@ -45,6 +45,12 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 
 ### fscstatus
     200 OK
+    http(s)://servername:port/fscstatus/
+
+    Returns a JSON array of FSC Status objects with the status of all FSC configured in the FMSMaster(s) configured in settings.ini
+
+### fscstatus/$host
+    200 OK
     http(s)://servername:port/fscstatus/$fschostname
     
     Returns a JSON with the status of the passed FSC, for example: http://fmshelper.yolo.com:8080/fscstatus/foo-bar-fsc1 (optional query parameter port: ?port=1234)
@@ -60,7 +66,7 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 }
 ```
 
-### fscalive
+### fscalive/$host
     200 OK
     http(s)://servername:port/fscalive/$fschostname
     
@@ -71,7 +77,7 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 {"status":"OK"}
 ```
 
-### fscversion
+### fscversion/$host
     200 OK
     http(s)://servername:port/fscversion/$fschostname
     

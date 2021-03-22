@@ -27,11 +27,13 @@ type FSCVersion struct {
 
 type FscStatus struct {
 	Status                  Status        `json:"status"`
+	Host                    string        `json:"host,omitempty"`
 	FSCId                   string        `json:"fsc_id,omitempty"`
 	Site                    string        `json:"site,omitempty"`
 	RunningTime             time.Duration `json:"running_time,omitempty"`
 	CurrentFileConnections  int64         `json:"current_file_connections,omitempty"`
 	CurrentAdminConnections int64         `json:"current_admin_connections,omitempty"`
+	Error                   string        `json:"error,omitempty"`
 }
 
 type FscConfig struct {
