@@ -142,5 +142,22 @@ func InitRouter() *gin.Engine {
 
 	})
 
+	r.GET("/log/:host", func(c *gin.Context) {
+		host := c.Param("host")
+		port := c.DefaultQuery("port", "4544")
+
+		lines := c.DefaultQuery("lines", "all")
+
+		output, err := fscCommand.FSCLog(host, port, lines)
+
+		if err != nil {
+			c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
+		} else {
+			// c.String(200, output)
+			c.Writer.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			c.String(200, output)
+		}
+	})
+
 	return r
 }

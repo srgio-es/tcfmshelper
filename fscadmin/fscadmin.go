@@ -1,6 +1,7 @@
 package fscadmin
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -56,6 +57,27 @@ func (fsc *FscCommand) FSCConfig(host string, port string) (string, error) {
 	}
 
 	return output[strings.Index(output, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>") : strings.LastIndex(output, "</fmsworld>")+len("</fmsworld>")], nil
+}
+
+func (fsc *FscCommand) FSCLog(host string, port string, lines string) (string, error) {
+	url := "http://" + host + ":" + port
+	output, err := fsc.fscAdminExec("-s", url, "./log")
+	if err != nil {
+		log.Printf("Error executing FSCLog error: %v\nresult: %v", err, output)
+		return "", parseError(output)
+	}
+
+	if lines == "all" {
+		return output[strings.Index(output, "Current log file:"):], nil
+	} else {
+		li, err := strconv.ParseInt(lines, 10, 64)
+		if err != nil {
+			log.Printf("Error executing FSCLog error: %v\n", err)
+			return "", errors.New("Parameter lines has to be 'all' or a valid integer")
+		}
+		return tailLog(output, li), nil
+	}
+
 }
 
 func (fsc *FscCommand) FCSAlive(host string, port string) (model.FscStatus, error) {
@@ -134,6 +156,21 @@ func parseStatus(status string) model.FscStatus {
 
 	}
 
+}
+
+func tailLog(output string, lines int64) string {
+	var result string
+
+	splitted := cleanAndSplitOutput(output)
+	tail := splitted[len(splitted)-int(lines):]
+
+	result += fmt.Sprintln(splitted[3] + "\n")
+
+	for _, s := range tail {
+		result += fmt.Sprintln(s)
+	}
+
+	return result
 }
 
 func parseVersion(output string) model.FSCVersion {

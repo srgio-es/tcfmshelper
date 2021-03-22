@@ -141,6 +141,16 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
 ]
 ```
 
+### log/$host
+
+    200 OK
+    http(s)://servername:port/log/$host
+
+    Returns the plain current text log from the passed FMS/FSC server, for example: http://fmshelper.yolo.com:8080/log/foo-bar-fsc1 
+    - Optional query parameter "port": ?port=1234
+    - Optional query parameter "lines": ?lines=100 (valid values: "all" or a valid integer, for example: 100)
+
+
 ### Error handling 
 
 Right now, in this development stage, all errors are returned with a 500 server error and a JSON object like so:
