@@ -30,6 +30,7 @@ WriteTimeout|60s|With unit (s for seconds, m for minutes)
 **[fsc]**| | 
 FscLocation|C:\Siemens\TC116\fsc|Not mandatory. It can be specified with the Environment Variable FMS\_HOME. Overrides the variable if specified.
 FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FMSs where the app will look.
+MaxParallel|2|Specifies the number of FSCAdmin consoles (jvms) to launch when process can be run in parallel (Default: 1) 
 
 ## Usage
 
@@ -48,6 +49,8 @@ FmsMasterURL|fmshost1:4544,fmshost2:4544|Comma separated list with the master FM
     http(s)://servername:port/fscstatus/
 
     Returns a JSON array of FSC Status objects with the status of all FSC configured in the FMSMaster(s) configured in settings.ini
+
+**IMPORTANT:** This process runs severals FSCAdmin consoles (jvms) in parallel to obtain data quicker. Please adjust the parameter MaxParallel in order to not consume all your resources.
 
 ### fscstatus/$host
     200 OK

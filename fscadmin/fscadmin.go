@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync/atomic"
 
 	"github.com/antchfx/xmlquery"
 	"github.com/srgio-es/tcfmshelper/fscadmin/model"
@@ -49,9 +50,7 @@ func (fsc *FscCommand) FSCStatus(host string, port string) (model.FscStatus, err
 
 }
 
-func (fsc *FscCommand) FSCStatusAll(host string, port string) ([]model.FscStatus, error) {
-
-	var result []model.FscStatus
+func (fsc *FscCommand) FSCStatusAll(host string, port string, parallelWorkers int) ([]model.FscStatus, error) {
 
 	configXml, err := fsc.FSCConfig(host, port)
 	if err != nil {
@@ -64,22 +63,54 @@ func (fsc *FscCommand) FSCStatusAll(host string, port string) ([]model.FscStatus
 		return nil, err
 	}
 
-	for i, n := range xmlquery.Find(doc, "//fsc") {
-		fmt.Printf("#%d %v\n", i, n.SelectAttr("address"))
-		addr := n.SelectAttr("address")
-		h := addr[strings.Index(addr, "//")+2 : strings.LastIndex(addr, ":")]
-		p := addr[strings.LastIndex(addr, ":")+1:]
-		log.Printf("host: %s -- port: %s", h, p)
+	nodes := make(chan *xmlquery.Node)
 
-		status, err := fsc.FSCStatus(h, p)
-		if err != nil {
-			status = model.FscStatus{Host: h, Status: model.STATUS_KO, Error: err.Error()}
+	go func() {
+		defer close(nodes)
+		for _, node := range xmlquery.Find(doc, "//fsc") {
+			nodes <- node
 		}
 
-		result = append(result, status)
+	}()
+
+	// fscNodes := xmlquery.Find(doc, "//fsc")
+
+	statuses := make(chan model.FscStatus)
+
+	nWorkers := parallelWorkers
+	workers := int32(nWorkers)
+	for i := 0; i < nWorkers; i++ {
+		go func() {
+			defer func() {
+				// Last one out closes shop
+				if atomic.AddInt32(&workers, -1) == 0 {
+					close(statuses)
+				}
+			}()
+
+			for n := range nodes {
+				fmt.Printf("%v\n", n.SelectAttr("address"))
+				addr := n.SelectAttr("address")
+				h := addr[strings.Index(addr, "//")+2 : strings.LastIndex(addr, ":")]
+				p := addr[strings.LastIndex(addr, ":")+1:]
+				log.Printf("host: %s -- port: %s", h, p)
+
+				status, err := fsc.FSCStatus(h, p)
+				if err != nil {
+					status = model.FscStatus{Host: h, Status: model.STATUS_KO, Error: err.Error()}
+				}
+
+				statuses <- status
+			}
+		}()
 	}
 
-	return result, nil
+	ret := []model.FscStatus{}
+	for status := range statuses {
+		ret = append(ret, status)
+	}
+
+	return ret, nil
 }
 
 func (fsc *FscCommand) FSCConfig(host string, port string) (string, error) {

@@ -147,7 +147,7 @@ func InitRouter() *gin.Engine {
 			log.Printf("host: %s", host)
 			log.Printf("port: %s", port)
 
-			output, err := fscCommand.FSCStatusAll(host, port)
+			output, err := fscCommand.FSCStatusAll(host, port, settings.FscSettings.MaxParallel)
 			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
 				c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
 			} else if err != nil && i == len(settings.FscSettings.FmsMasterURL)-1 {

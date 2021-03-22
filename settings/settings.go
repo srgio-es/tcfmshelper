@@ -22,11 +22,12 @@ type Server struct {
 type FSC struct {
 	FscLocation  string
 	FmsMasterURL []string
+	MaxParallel  int
 }
 
 var AppSettings = &Application{}
 var ServerSettings = &Server{}
-var FscSettings = &FSC{}
+var FscSettings = &FSC{MaxParallel: 1}
 
 var cfg *ini.File
 
@@ -71,5 +72,5 @@ func Setup() {
 //PrintDebugConfig prints the configuration if debug is enabled
 func PrintDebugConfig() {
 	log.Printf("Server config loaded: \n  -- RunMode: %s\n  -- Port: %d\n  -- ReadTimeout: %v\n  -- WriteTimeout: %v\n", ServerSettings.RunMode, ServerSettings.Port, ServerSettings.ReadTimeout, ServerSettings.WriteTimeout)
-	log.Printf("FSC config loaded: \n  -- FscLocation: %s\n  -- FmsMasterURL: %#v", FscSettings.FscLocation, FscSettings.FmsMasterURL)
+	log.Printf("FSC config loaded: \n  -- FscLocation: %s\n  -- FmsMasterURL: %#v\n  -- MaxParallel: %d\n", FscSettings.FscLocation, FscSettings.FmsMasterURL, FscSettings.MaxParallel)
 }
