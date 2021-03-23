@@ -2,6 +2,7 @@ package routers
 
 import (
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,9 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+
+	r.LoadHTMLGlob("templates/*")
+	r.Static("/assets", "./assets")
 
 	fscCommand := fscadmin.FscCommand{
 		JavaHome: settings.AppSettings.JavaHome,
@@ -158,6 +162,26 @@ func InitRouter() *gin.Engine {
 			}
 		}
 
+	})
+
+	r.GET("/fscdashboard/", func(c *gin.Context) {
+		for i, fsc := range settings.FscSettings.FmsMasterURL {
+			host := fsc[:strings.Index(fsc, ":")]
+			port := fsc[strings.Index(fsc, ":")+1:]
+
+			log.Printf("host: %s", host)
+			log.Printf("port: %s", port)
+
+			output, err := fscCommand.FSCStatusAll(host, port, settings.FscSettings.MaxParallel)
+			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
+				c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
+			} else if err != nil && i == len(settings.FscSettings.FmsMasterURL)-1 {
+				c.JSON(500, model.Error{Status: model.STATUS_KO, Message: "All declared FMS masters are down"})
+			} else if err == nil {
+				c.HTML(http.StatusOK, "fscdashboard.tmpl", output)
+				return
+			}
+		}
 	})
 
 	r.GET("/log/:host", func(c *gin.Context) {

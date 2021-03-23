@@ -1,0 +1,12 @@
+.status {
+    font-weight: 400;
+    text-align: center;
+}
+
+.status_ok {
+    color: green;
+}
+
+.status_ko {
+    color: red;
+}   

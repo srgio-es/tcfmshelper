@@ -1,0 +1,31 @@
+{{template "header"}}
+
+<div class="container-fluid">
+    <div class="row">
+    {{range .}}
+        <div class="col-lg-3">
+            {{if eq .Status "OK"}}
+            <div class="alert alert-success fsc_status">
+            {{else}}
+            <div class="alert alert-danger fsc_status">
+            {{end}}
+                <span class="host">Host: {{.Host}}</span>
+                <br><span class="fsc_id">Fsc Id: {{.FSCId}}</span>
+                <hr><h4>
+                {{if eq .Status "OK"}}
+                <span class="status status_ok">
+                {{else}}
+                <span class="status status_ko">
+                {{end}}
+                    {{.Status}}
+                </h4></span>
+                {{if ne .Error ""}}
+                <br>{{.Error}}
+                {{end}}
+            </div>
+        </div>
+    {{end}}
+    </div>
+</div>
+
+{{template "footer"}}
