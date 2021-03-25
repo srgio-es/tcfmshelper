@@ -10,3 +10,12 @@
 .status_ko {
     color: red;
 }   
+
+.host-url{
+    font-size: 0.75em;
+}
+
+.title {
+    margin: 1em auto;
+    text-align: center;
+}

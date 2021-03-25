@@ -1,6 +1,10 @@
 {{template "header"}}
 
 <div class="container-fluid">
+    <div class="title jumbotron jumbotron-fluid">
+       <h1 class="display-4">Current FSC Servers Status</h2>
+       <hr class="my-4">
+    </div>
     <div class="row">
     {{range .}}
         <div class="col-lg-3">
@@ -9,9 +13,14 @@
             {{else}}
             <div class="alert alert-danger fsc_status">
             {{end}}
-                <span class="host">Host: {{.Host}}</span>
-                <br><span class="fsc_id">Fsc Id: {{.FSCId}}</span>
-                <hr><h4>
+                <span class="host">
+                    <b>Host:</b> <span class="host-url"> {{.Host}}</span>
+                </span>
+                <br>
+                <span class="fsc_id">
+                    <b>Fsc Id:</b> <span class="host-id"> {{.FSCId}}</span>
+                </span>
+                <hr><h6>
                 {{if eq .Status "OK"}}
                 <span class="status status_ok">
                 {{else}}
