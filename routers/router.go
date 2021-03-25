@@ -27,7 +27,7 @@ func InitRouter() *gin.Engine {
 		FmsHome:  settings.FscSettings.FscLocation,
 	}
 
-	r.GET("/serverhealth", func(c *gin.Context) {
+	r.GET("/healthcheck", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"server_status": "up",
 		})
