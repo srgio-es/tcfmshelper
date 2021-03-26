@@ -90,7 +90,7 @@ func (fsc *FscCommand) FSCStatusAll(host string, port string, parallelWorkers in
 			}()
 
 			for n := range nodes {
-				fmt.Printf("%v\n", n.SelectAttr("address"))
+				settings.Log.Logger.Sugar().Debugf("FSCStatusAll Calling address: %v", n.SelectAttr("address"))
 				addr := n.SelectAttr("address")
 				h := addr[strings.Index(addr, "//")+2 : strings.LastIndex(addr, ":")]
 				p := addr[strings.LastIndex(addr, ":")+1:]
