@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/srgio-es/tcfmshelper/server"
 	"github.com/srgio-es/tcfmshelper/settings"
+	"go.uber.org/zap"
 )
 
 func init() {
@@ -13,9 +13,10 @@ func init() {
 }
 
 func main() {
+	settings.Log.Logger.Sugar().Info("TCFMSHELPER starting")
 	err := server.Run()
 	if err != nil {
-		log.Println(err)
+		settings.Log.Logger.Error("An error occurred", zap.Error(err))
 		os.Exit(1)
 	}
 }

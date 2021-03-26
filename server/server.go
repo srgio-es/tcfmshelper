@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,7 @@ func Run() error {
 		WriteTimeout: settings.ServerSettings.WriteTimeout,
 	}
 
-	log.Printf("Start http server listening %s", endPoint)
+	settings.Log.Logger.Sugar().Infof("Starterd http server listening %s", endPoint)
 
 	err := server.ListenAndServe()
 

@@ -2,11 +2,12 @@ package fscadmin
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
 	"github.com/srgio-es/tcfmshelper/fscadmin/model"
+	"github.com/srgio-es/tcfmshelper/settings"
+	"go.uber.org/zap"
 )
 
 func parseStatus(status string, host string) model.FscStatus {
@@ -28,18 +29,19 @@ func parseStatus(status string, host string) model.FscStatus {
 		var err error
 		fscStatus.CurrentFileConnections, err = strconv.ParseInt(linesSplited[5][strings.Index(linesSplited[5], ":")+2:], 10, 64)
 		if err != nil {
-			log.Printf("Failed while parsing FSC Status result: %v", err)
+			settings.Log.Logger.Error("Failed while parsing FSC Status", zap.Error(err))
 		}
 		fscStatus.CurrentAdminConnections, err = strconv.ParseInt(linesSplited[6][strings.Index(linesSplited[6], ":")+2:], 10, 64)
 		if err != nil {
-			log.Printf("Failed while parsing FSC Status result: %v", err)
+			settings.Log.Logger.Error("Failed while parsing FSC Status", zap.Error(err))
+
 		}
 
 		//TODO: Parse duration
 
 		fscStatus.Status = model.STATUS_OK
 
-		log.Printf("%#v", fscStatus)
+		settings.Log.Logger.Debug("FscStatus", zap.Any("value", fscStatus))
 
 		return fscStatus
 
@@ -116,7 +118,7 @@ func convertToConfigItem(configline string) model.FscConfig {
 
 	item.IsMaster, err = strconv.ParseBool(splitted[2])
 	if err != nil {
-		log.Printf("Failed while parsing FSC config item: %v", err)
+		settings.Log.Logger.Error("Failed while parsing FSC config item", zap.Error(err))
 	}
 
 	if splitted[3] == "ok" {

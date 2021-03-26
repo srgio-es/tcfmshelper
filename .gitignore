@@ -18,6 +18,9 @@ conf/settings.ini
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+## Logs
+/logs
+
 ### Go Patch ###
 /vendor/
 /Godeps/

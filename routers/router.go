@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
@@ -15,6 +14,9 @@ var fscCommand fscadmin.FscCommand
 
 //InitRouter initializes main router
 func InitRouter() *gin.Engine {
+	gin.DefaultWriter = settings.Log.StdOut
+	gin.DefaultErrorWriter = settings.Log.StdErr
+
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
@@ -106,9 +108,6 @@ func InitRouter() *gin.Engine {
 			host := fsc[:strings.Index(fsc, ":")]
 			port := fsc[strings.Index(fsc, ":")+1:]
 
-			log.Printf("host: %s", host)
-			log.Printf("port: %s", port)
-
 			output, err := fscCommand.FSCConfig(host, port)
 			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
 				c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
@@ -126,9 +125,6 @@ func InitRouter() *gin.Engine {
 		for i, fsc := range settings.FscSettings.FmsMasterURL {
 			host := fsc[:strings.Index(fsc, ":")]
 			port := fsc[strings.Index(fsc, ":")+1:]
-
-			log.Printf("host: %s", host)
-			log.Printf("port: %s", port)
 
 			output, err := fscCommand.FSCConfigReport(host, port)
 			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
@@ -148,9 +144,6 @@ func InitRouter() *gin.Engine {
 			host := fsc[:strings.Index(fsc, ":")]
 			port := fsc[strings.Index(fsc, ":")+1:]
 
-			log.Printf("host: %s", host)
-			log.Printf("port: %s", port)
-
 			output, err := fscCommand.FSCStatusAll(host, port, settings.FscSettings.MaxParallel)
 			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
 				c.JSON(500, model.Error{Status: model.STATUS_KO, Message: err.Error()})
@@ -168,9 +161,6 @@ func InitRouter() *gin.Engine {
 		for i, fsc := range settings.FscSettings.FmsMasterURL {
 			host := fsc[:strings.Index(fsc, ":")]
 			port := fsc[strings.Index(fsc, ":")+1:]
-
-			log.Printf("host: %s", host)
-			log.Printf("port: %s", port)
 
 			output, err := fscCommand.FSCStatusAll(host, port, settings.FscSettings.MaxParallel)
 			if err != nil && !strings.Contains(err.Error(), "Unknown Host") {
